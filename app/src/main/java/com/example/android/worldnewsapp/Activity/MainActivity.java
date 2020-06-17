@@ -1,24 +1,17 @@
 package com.example.android.worldnewsapp.Activity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.example.android.worldnewsapp.Adapter.NewsAdapter;
-import com.example.android.worldnewsapp.Model.News;
-import com.example.android.worldnewsapp.Model.NewsResponse;
+import com.example.android.worldnewsapp.Adapter.LiveNewsAdapter;
 import com.example.android.worldnewsapp.R;
-import com.example.android.worldnewsapp.Rest.ApiClient;
-import com.example.android.worldnewsapp.Rest.ApiInterface;
-
-import java.util.List;
+import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
+import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -26,6 +19,9 @@ public class MainActivity extends AppCompatActivity {
     private final static String country = "gb";
     private final static String category = "sports";
     private final static String API_KEY = "7bf5a5d4b62e4d1c939e97ebf66167c4";
+
+    private WorldNewsViewModel worldNewsViewModel;
+    private WorldNewsViewModelFactory worldNewsViewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +31,27 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
             return;
         }
-        final RecyclerView recyclerView =  findViewById(R.id.news_recycler_view);
+        final RecyclerView recyclerView = findViewById(R.id.news_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
 
-        ApiInterface apiService =
+        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
+        recyclerView.setAdapter(liveNewsAdapter);
+
+        worldNewsViewModelFactory = new WorldNewsViewModelFactory(getApplication());
+        worldNewsViewModel = new ViewModelProvider(this, worldNewsViewModelFactory).get(WorldNewsViewModel.class);
+
+        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
+        /*worldNewsViewModel.getAllNews().observe(this, new Observer<List<LiveNews>>() {
+            @Override
+            public void onChanged(List<LiveNews> liveNews) {
+                liveNewsAdapter.submitList(liveNews);
+            }
+        });*/
+
+
+
+        /*ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
 
         Call<NewsResponse> call =apiService.getTopHeadlines(country,category,API_KEY);
@@ -55,6 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 // Log error here since request failed
                 Log.e(TAG, t.toString());
             }
-        });
+        });*/
     }
 }
