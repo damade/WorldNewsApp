@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.worldnewsapp.Model.News;
@@ -16,28 +15,17 @@ import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder>{
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
     private List<News> news;
     private int rowLayout;
     private Context context;
     private static CircleImageView newsImage;
 
-    public static class NewsViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout newsLayout;
-        TextView newsTitle;
-        TextView url;
-        TextView author;
-
-
-
-        public NewsViewHolder(View v) {
-            super(v);
-            newsLayout = v.findViewById(R.id.news_layout);
-            newsTitle =  v.findViewById(R.id.title);
-            url =  v.findViewById(R.id.url);
-            author =  v.findViewById(R.id.author);
-            newsImage =  v.findViewById(R.id.image);
+    private void showImage(String url) {
+        if (url != null && url.isEmpty() == false) {
+            Picasso.get().load(url).resize(150, 150).centerCrop().into(newsImage);
         }
+
     }
 
     public NewsAdapter(List<News> news, int rowLayout, Context context) {
@@ -66,10 +54,20 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         return news.size();
     }
 
-    private void showImage(String url) {
-        if (url != null && url.isEmpty() == false) {
-            Picasso.get().load(url).resize(200,200).centerCrop().into(newsImage);
-        }
+    public static class NewsViewHolder extends RecyclerView.ViewHolder {
+        //LinearLayout newsLayout;
+        TextView newsTitle;
+        TextView url;
+        TextView author;
 
+
+        public NewsViewHolder(View v) {
+            super(v);
+            //newsLayout = v.findViewById(R.id.news_layout);
+            newsTitle = v.findViewById(R.id.title);
+            url = v.findViewById(R.id.url);
+            author = v.findViewById(R.id.author);
+            newsImage = v.findViewById(R.id.image);
+        }
     }
 }

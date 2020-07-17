@@ -4,11 +4,16 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.android.worldnewsapp.Adapter.LiveNewsAdapter;
+import com.example.android.worldnewsapp.Model.LiveNewsResponse;
+import com.example.android.worldnewsapp.Model.NewsLocal;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
 import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFactory;
 
+import java.util.List;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WorldNewsViewModel worldNewsViewModel;
     private WorldNewsViewModelFactory worldNewsViewModelFactory;
+    private LiveData<List<LiveNewsResponse>> theNewsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
         worldNewsViewModelFactory = new WorldNewsViewModelFactory(getApplication());
         worldNewsViewModel = new ViewModelProvider(this, worldNewsViewModelFactory).get(WorldNewsViewModel.class);
 
-        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
+        worldNewsViewModel.initData();
+        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList((List<NewsLocal>) liveNews));
         /*worldNewsViewModel.getAllNews().observe(this, new Observer<List<LiveNews>>() {
             @Override
             public void onChanged(List<LiveNews> liveNews) {
@@ -51,10 +58,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        /*ApiInterface apiService =
+        /*final RecyclerView recyclerView = findViewById(R.id.news_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
 
-        Call<NewsResponse> call =apiService.getTopHeadlines(country,category,API_KEY);
+        Call<NewsResponse> call = apiService.getTopHeadlines(country,category,API_KEY);
         call.enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {

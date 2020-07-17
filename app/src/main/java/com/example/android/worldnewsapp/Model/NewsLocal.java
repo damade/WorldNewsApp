@@ -3,7 +3,7 @@ package com.example.android.worldnewsapp.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class LiveNews {
+public class NewsLocal {
     @SerializedName("source")
     @Expose
     private Source sources;
@@ -29,8 +29,8 @@ public class LiveNews {
     @Expose
     private String content;
 
-    public LiveNews(Source sources, String author, String description,
-                    String url, String urlToImage, String title, String publishedAt, String content) {
+    public NewsLocal(Source sources, String author, String description,
+                     String url, String urlToImage, String title, String publishedAt, String content) {
         this.sources = sources;
         this.author = author;
         this.description = description;

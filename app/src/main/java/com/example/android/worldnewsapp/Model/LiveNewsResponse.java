@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
+
 public class LiveNewsResponse {
     @SerializedName("status")
     @Expose
@@ -14,7 +16,7 @@ public class LiveNewsResponse {
     private int totalResults;
     @SerializedName("articles")
     @Expose
-    private List<News> articles;
+    private LiveData<List<NewsLocal>> articles;
 
 
     public String getStatus() {
@@ -25,11 +27,11 @@ public class LiveNewsResponse {
         this.status = status;
     }
 
-    public List<News> getArticles() {
+    public LiveData<List<NewsLocal>> getArticles() {
         return articles;
     }
 
-    public void setArticles(List<News> articles) {
+    public void setArticles(LiveData<List<NewsLocal>> articles) {
         this.articles = articles;
     }
 

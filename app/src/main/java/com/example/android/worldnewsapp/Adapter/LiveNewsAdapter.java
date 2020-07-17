@@ -3,10 +3,9 @@ package com.example.android.worldnewsapp.Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.android.worldnewsapp.Model.LiveNews;
+import com.example.android.worldnewsapp.Model.NewsLocal;
 import com.example.android.worldnewsapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -16,23 +15,23 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class LiveNewsAdapter extends ListAdapter<LiveNews, LiveNewsAdapter.ViewHolder> {
+public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.ViewHolder> {
 
-    private static final DiffUtil.ItemCallback<LiveNews> DIFF_CALLBACK = new DiffUtil.ItemCallback<LiveNews>() {
+    private static final DiffUtil.ItemCallback<NewsLocal> DIFF_CALLBACK = new DiffUtil.ItemCallback<NewsLocal>() {
         @Override
-        public boolean areItemsTheSame(@NonNull LiveNews oldItem, @NonNull LiveNews newItem) {
+        public boolean areItemsTheSame(@NonNull NewsLocal oldItem, @NonNull NewsLocal newItem) {
             return oldItem.getTitle().equals(newItem.getTitle());
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull LiveNews oldItem, @NonNull LiveNews newItem) {
+        public boolean areContentsTheSame(@NonNull NewsLocal oldItem, @NonNull NewsLocal newItem) {
             return oldItem.getAuthor().equals(newItem.getAuthor()) &&
                     oldItem.getUrl().equals(newItem.getUrl()) &&
                     oldItem.getUrlToImage().equals(newItem.getUrlToImage());
         }
     };
-    private static CircleImageView newsImage;
     //private OnItemClickListener listener;
+    private static CircleImageView newsImage;
 
     public LiveNewsAdapter() {
         super(DIFF_CALLBACK);
@@ -48,7 +47,7 @@ public class LiveNewsAdapter extends ListAdapter<LiveNews, LiveNewsAdapter.ViewH
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        LiveNews currentNews = getItem(position);
+        NewsLocal currentNews = getItem(position);
         String aNewsTitle = currentNews.getTitle();
         String aNewsUrl = currentNews.getUrl();
         String aNewsAuthor = currentNews.getAuthor();
@@ -60,7 +59,7 @@ public class LiveNewsAdapter extends ListAdapter<LiveNews, LiveNewsAdapter.ViewH
         showImage(aNewsImage);
     }
 
-    public LiveNews getNoteAt(int position) {
+    public NewsLocal getNoteAt(int position) {
         return getItem(position);
     }
 
@@ -81,14 +80,12 @@ public class LiveNewsAdapter extends ListAdapter<LiveNews, LiveNewsAdapter.ViewH
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout newsLayout;
         TextView newsTitle;
         TextView url;
         TextView author;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            newsLayout = itemView.findViewById(R.id.news_layout);
             newsTitle = itemView.findViewById(R.id.title);
             url = itemView.findViewById(R.id.url);
             author = itemView.findViewById(R.id.author);
