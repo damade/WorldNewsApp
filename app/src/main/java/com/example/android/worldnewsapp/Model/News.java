@@ -29,6 +29,9 @@ public class News {
     @Expose
     private String content;
 
+    public News() {
+    }
+
     public News(Source sources, String author, String description,
                 String url, String urlToImage, String title, String publishedAt, String content) {
         this.sources = sources;

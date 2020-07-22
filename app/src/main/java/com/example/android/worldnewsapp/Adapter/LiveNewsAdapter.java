@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.worldnewsapp.Model.NewsLocal;
+import com.example.android.worldnewsapp.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.R;
 import com.squareup.picasso.Picasso;
 

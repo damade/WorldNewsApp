@@ -2,6 +2,7 @@ package com.example.android.worldnewsapp.Database.Model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "news_table")
@@ -10,6 +11,7 @@ public class NewsLocal {
     @PrimaryKey(autoGenerate = true)
     private int newsId;
 
+    @Ignore
     @ColumnInfo(name = "news_sources")
     private Source sources;
 
@@ -33,6 +35,9 @@ public class NewsLocal {
 
     @ColumnInfo(name = "news_content")
     private String content;
+
+    public NewsLocal() {
+    }
 
     public NewsLocal(Source sources, String author, String description,
                      String url, String urlToImage, String title, String publishedAt, String content) {

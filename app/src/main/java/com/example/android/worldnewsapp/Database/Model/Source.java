@@ -1,9 +1,26 @@
 package com.example.android.worldnewsapp.Database.Model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
+
+@Entity(foreignKeys = {
+        @ForeignKey(
+                entity = NewsLocal.class,
+                parentColumns = "sourceId",
+                childColumns = "id"
+        )})
+
 public class Source {
 
+    @PrimaryKey(autoGenerate = true)
+    private int sourceId;
+
+    @ColumnInfo(name = "id")
     private String id;
 
+    @ColumnInfo(name = "source_name")
     private String name;
 
     public Source(String id, String name) {

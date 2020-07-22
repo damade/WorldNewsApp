@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.android.worldnewsapp.Adapter.LiveNewsAdapter;
+import com.example.android.worldnewsapp.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.Model.LiveNewsResponse;
-import com.example.android.worldnewsapp.Model.NewsLocal;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
 import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFactory;
