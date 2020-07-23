@@ -22,9 +22,9 @@ public class WorldNewsViewModel extends AndroidViewModel {
     }
 
     public void initData() {
-        if (allNews != null) {
+        /*if (allNews != null) {
             return;
-        }
+        }*/
         repository = new WorldNewsRepository(getApplication());
         allNews = repository.getAllNews();
     }

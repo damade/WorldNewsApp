@@ -176,34 +176,35 @@ public class WorldNewsRepository {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            ApiInterface apiService =
-                    ApiClient.getClient().create(ApiInterface.class);
-            Call<NewsResponse> call = apiService.getTopHeadlines(country, category, API_KEY);
-            call.enqueue(new Callback<NewsResponse>() {
-                @Override
-                public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
-                    int statusCode = response.code();
-                    if (response.isSuccessful()) {
-                        assert response.body() != null;
-                        List<News> freshNews = response.body().getArticles();
-                        List<com.example.android.worldnewsapp.Database.Model.NewsLocal> theList = null;
-                        for (News eachNew : freshNews) {
-                            new Thread(() -> {
-                                com.example.android.worldnewsapp.Database.Model.NewsLocal oneAtATime = convertObject(eachNew);
-                                newsDao.insert(oneAtATime);
-                            }).start();
+            new Thread(() -> {
+                ApiInterface apiService =
+                        ApiClient.getClient().create(ApiInterface.class);
+                Call<NewsResponse> call = apiService.getTopHeadlines(country, category, API_KEY);
+                call.enqueue(new Callback<NewsResponse>() {
+                    @Override
+                    public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                        int statusCode = response.code();
+                        if (response.isSuccessful()) {
+                            assert response.body() != null;
+                            List<News> freshNews = response.body().getArticles();
+                            for (News eachNew : freshNews) {
+                                new Thread(() -> {
+                                    com.example.android.worldnewsapp.Database.Model.NewsLocal oneAtATime = convertObject(eachNew);
+                                    newsDao.insert(oneAtATime);
+                                }).start();
+                            }
                         }
+
                     }
 
-                }
+                    @Override
+                    public void onFailure(Call<NewsResponse> call, Throwable t) {
+                        // Log error here since request failed
+                        Log.e(TAG, t.toString());
 
-                @Override
-                public void onFailure(Call<NewsResponse> call, Throwable t) {
-                    // Log error here since request failed
-                    Log.e(TAG, t.toString());
-
-                }
-            });
+                    }
+                });
+            }).start();
             return null;
         }
     }

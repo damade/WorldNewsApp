@@ -25,9 +25,10 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
 
         @Override
         public boolean areContentsTheSame(@NonNull NewsLocal oldItem, @NonNull NewsLocal newItem) {
-            return oldItem.getAuthor().equals(newItem.getAuthor()) &&
+            /*return oldItem.getAuthor().equals(newItem.getAuthor()) &&
                     oldItem.getUrl().equals(newItem.getUrl()) &&
-                    oldItem.getUrlToImage().equals(newItem.getUrlToImage());
+                    oldItem.getUrlToImage().equals(newItem.getUrlToImage());*/
+            return oldItem.getUrl().equals(newItem.getUrl());
         }
     };
     //private OnItemClickListener listener;
@@ -52,7 +53,9 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
         String aNewsUrl = currentNews.getUrl();
         String aNewsAuthor = currentNews.getAuthor();
         String aNewsImage = currentNews.getUrlToImage();
-
+        if (aNewsAuthor == null) {
+            aNewsAuthor = "Anonymous";
+        }
         holder.newsTitle.setText(aNewsTitle);
         holder.url.setText(aNewsUrl);
         holder.author.setText(aNewsAuthor);

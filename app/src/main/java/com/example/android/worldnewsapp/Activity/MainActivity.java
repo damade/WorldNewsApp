@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.android.worldnewsapp.Adapter.LiveNewsAdapter;
-import com.example.android.worldnewsapp.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.Model.LiveNewsResponse;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
@@ -12,11 +11,13 @@ import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFacto
 
 import java.util.List;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -33,22 +34,33 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (API_KEY.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
-            return;
-        }
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_toolbar);
+
         final RecyclerView recyclerView = findViewById(R.id.news_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
-        recyclerView.setAdapter(liveNewsAdapter);
-
         worldNewsViewModelFactory = new WorldNewsViewModelFactory(getApplication());
         worldNewsViewModel = new ViewModelProvider(this, worldNewsViewModelFactory).get(WorldNewsViewModel.class);
 
+        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
+        recyclerView.setAdapter(liveNewsAdapter);
+
+        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> {
+            worldNewsViewModel.initData();
+            worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
+            pullToRefresh.setRefreshing(false);
+        });
+
+        if (API_KEY.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         worldNewsViewModel.initData();
-        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList((List<NewsLocal>) liveNews));
+        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
         /*worldNewsViewModel.getAllNews().observe(this, new Observer<List<LiveNews>>() {
             @Override
             public void onChanged(List<LiveNews> liveNews) {
@@ -81,4 +93,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
     }
+
+
 }
