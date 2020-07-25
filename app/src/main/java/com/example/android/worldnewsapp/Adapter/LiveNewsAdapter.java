@@ -31,7 +31,8 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
             return oldItem.getUrl().equals(newItem.getUrl());
         }
     };
-    //private OnItemClickListener listener;
+
+    private OnItemClickListener listener;
     private static CircleImageView newsImage;
 
     public LiveNewsAdapter() {
@@ -62,17 +63,17 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
         showImage(aNewsImage);
     }
 
-    public NewsLocal getNoteAt(int position) {
+    public NewsLocal getNewslocalAt(int position) {
         return getItem(position);
     }
 
-    /*public void setOnItemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Note note);
-    }*/
+        void onItemClick(NewsLocal newsLocal);
+    }
 
     private void showImage(String url) {
         if (url != null && url.isEmpty() == false) {
@@ -94,7 +95,7 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
             author = itemView.findViewById(R.id.author);
             newsImage = itemView.findViewById(R.id.image);
 
-            /*itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
@@ -102,7 +103,7 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
                         listener.onItemClick(getItem(position));
                     }
                 }
-            });*/
+            });
 
         }
     }

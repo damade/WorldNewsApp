@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Activity.NoteActivity">
+
+
+    <item
+        android:id="@+id/action_open_chrome"
+        android:orderInCategory="100"
+        android:title="@string/action_open_chrome"
+        app:showAsAction="never" />
+
+
+</menu>

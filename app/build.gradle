@@ -33,10 +33,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     def room_version = "2.2.4"
     def lifecycle_version = "2.2.0"
     def arch_version = "2.1.0"
 
+    implementation 'androidx.preference:preference:1.1.0'
+    
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"

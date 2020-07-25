@@ -9,6 +9,7 @@
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.News.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.News.MediumComponent
         </item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light">
