@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.example.android.worldnewsapp.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.R;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
@@ -76,8 +77,13 @@ public class LiveNewsAdapter extends ListAdapter<NewsLocal, LiveNewsAdapter.View
     }
 
     private void showImage(String url) {
-        if (url != null && url.isEmpty() == false) {
-            Picasso.get().load(url).resize(200, 200).centerCrop().into(newsImage);
+        if (url != null && !url.isEmpty()) {
+            Picasso.get().load(url)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                    .placeholder(R.mipmap.news_primary_100px)
+                    .error(R.mipmap.news_primary_100px)
+                    .resize(200, 200)
+                    .centerCrop().into(newsImage);
         }
 
     }

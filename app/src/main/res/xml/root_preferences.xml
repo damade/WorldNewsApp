@@ -5,7 +5,7 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:key="notify"
+            app:key="@string/key_notification_reminder"
             app:summary="@string/notify_summary"
             app:title="@string/notify_title" />
 
