@@ -1,0 +1,37 @@
+package com.example.android.worldnewsapp.BusinessFragment.BusinessViewModel;
+
+import android.app.Application;
+
+import com.example.android.worldnewsapp.Database.Model.NewsLocal;
+import com.example.android.worldnewsapp.Repository.WorldNewsRepository;
+
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
+public class BusinessViewModel extends AndroidViewModel {
+    private WorldNewsRepository repository;
+    private LiveData<List<NewsLocal>> allNews;
+
+    public BusinessViewModel(@NonNull Application application) {
+        super(application);
+        repository = new WorldNewsRepository(application);
+        allNews = repository.getAllNews();
+    }
+
+    public void initData() {
+        /*if (allNews != null) {
+            return;
+        }*/
+        repository = new WorldNewsRepository(getApplication());
+        allNews = repository.getAllNews();
+    }
+
+
+    public LiveData<List<NewsLocal>> getAllNews() {
+        return allNews;
+    }
+}
+

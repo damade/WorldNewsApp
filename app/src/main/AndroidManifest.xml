@@ -29,10 +29,6 @@
             android:name=".Notifications.AlarmReceiver"
             android:enabled="true"
             android:exported="true" />
-        <receiver
-            android:name=".Notifications.NotificationReceiver"
-            android:enabled="true"
-            android:exported="true" />
 
         <receiver
             android:name=".Notifications.DeviceBootReceiver"

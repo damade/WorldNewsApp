@@ -30,4 +30,13 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="key_notification_reminder">notify</string>
+
+    <!--Bottom Navigation -->
+    <string name="title_home"><b>Home</b></string>
+    <string name="title_search"><b>Search</b></string>
+    <string name="title_business"><b>Business</b></string>
+    <string name="title_sports"><b>Sports</b></string>
+    <string name="title_others"><b>Others</b></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

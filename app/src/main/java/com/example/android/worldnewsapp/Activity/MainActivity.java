@@ -3,7 +3,6 @@ package com.example.android.worldnewsapp.Activity;
 import android.app.NotificationManager;
 import android.app.job.JobScheduler;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -63,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Register the broadcast receiver to receive the update action from
         // the notification.
-        registerReceiver(mReceiver,
-                new IntentFilter(ACTION_UPDATE_NOTIFICATION));
+
 
         recyclerView = findViewById(R.id.news_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -163,4 +161,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    /*private void loadFragment(Fragment fragment) {
+        // load fragment
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }*/
 }

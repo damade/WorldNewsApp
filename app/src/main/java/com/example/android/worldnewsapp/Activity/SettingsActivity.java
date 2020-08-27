@@ -239,7 +239,7 @@ public class SettingsActivity extends AppCompatActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
             // notification preference change listener
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.key_notification_reminder)));
+            //bindPreferenceSummaryToValue(findPreference(getString(R.string.key_notification_reminder)));
 
         }
     }
