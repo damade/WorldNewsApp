@@ -24,7 +24,7 @@ public interface TheNewsDao {
     void delete(NewsLocal news);
 
     @Query("DELETE FROM the_news_table WHERE news_category LIKE :categoryInput")
-    void clearAllGeneralArticle(String categoryInput);
+    void clearCategoryArticle(String categoryInput);
 
     @Query("SELECT * FROM the_news_table WHERE news_category LIKE (:categoryInput)")
     LiveData<List<NewsLocal>> getCategoryNewsArticles(String categoryInput);

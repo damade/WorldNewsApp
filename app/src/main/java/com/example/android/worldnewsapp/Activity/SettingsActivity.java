@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 
 import com.example.android.worldnewsapp.Notifications.AlarmReceiver;
 import com.example.android.worldnewsapp.Notifications.DeviceBootReceiver;
@@ -78,7 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
         // if user enabled daily notifications
         if (dailyNotify) {
 
-            //Where the newly added stuff started from
+            /*//Where the newly added stuff started from
             long repeatInterval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
 
             long triggerTime = SystemClock.elapsedRealtime()
@@ -98,7 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
                 if (alarmManager != null) {
                     alarmManager.cancel(notifyPendingIntent);
                 }
-            }//Where it ends.
+            }//Where it ends.*/
 
             //region Enable Daily Notifications
             Calendar calendar = Calendar.getInstance();
@@ -239,7 +238,7 @@ public class SettingsActivity extends AppCompatActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
             // notification preference change listener
-            //bindPreferenceSummaryToValue(findPreference(getString(R.string.key_notification_reminder)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.key_notification_reminder)));
 
         }
     }

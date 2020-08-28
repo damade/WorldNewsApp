@@ -1,21 +1,25 @@
 package com.example.android.worldnewsapp.Backend.Repository;
 
 import android.app.Application;
+import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.android.worldnewsapp.Backend.Database.DataAccessObject.TheNewsDao;
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
+import com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.Backend.Database.NewsDatabase;
-import com.example.android.worldnewsapp.Database.DataAccessObjects.NewsDao;
-import com.example.android.worldnewsapp.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.Model.News;
 import com.example.android.worldnewsapp.Model.NewsResponse;
 import com.example.android.worldnewsapp.Model.Source;
-import com.example.android.worldnewsapp.Repository.WorldNewsRepository;
+import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.Rest.ApiClient;
 import com.example.android.worldnewsapp.Rest.ApiInterface;
 import com.example.android.worldnewsapp.Utils.ConnectionDetector;
@@ -28,8 +32,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class NewsRepository {
-    private final static String country = "gb";
-    private final static String category = "sports";
+    //private final static String country = "gb";
+    //private final static String category = "sports";
     private final static String API_KEY = DatabaseDetails.API_KEY;
     private static final String TAG = NewsRepository.class.getSimpleName();
 
@@ -40,31 +44,28 @@ public class NewsRepository {
     // Alert Dialog Manager
     private TheNewsDao newsDao;
     private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> allNews;
+    private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> topTenNews;
 
 
-    public NewsRepository(Application application) {
+    public NewsRepository(Application application, String category, String country) {
         NewsDatabase newsDatabase = NewsDatabase.getInstance(application);
-        newsDao = newsDatabase.newsDao();
-        //allNews = newsDao.getNewsArticles();
-        /*if (webServiceNews == null) {
-            webServiceNews = getNewsFromWebService();
-        }*/
-        if (CheckConnectivity(application)) {
-            clearAllArticles();
-            insertAllArticles();
-        } else {
-            if (allNews == null) {
-                clearAllArticles();
-                insertAllArticles();
+        new Thread(() -> {
+            newsDao = newsDatabase.newsDao();
+            allNews = newsDao.getCategoryNewsArticles(category);
+            topTenNews = newsDao.getTopTenCategoryNewsArticles(category);
+            /*if (webServiceNews == null) {
+                webServiceNews = getNewsFromWebService();
+            }*/
+            if (CheckConnectivity(application)) {
+                clearAllArticles(category);
+                insertAllArticles(category, country);
+            } else {
+                if (allNews == null) {
+                    clearAllArticles(category);
+                    insertAllArticles(category, country);
+                }
             }
-        }
-        /*else {
-            //cd = new ConnectionDetector(MainActivity.);
-            // Check if Internet present
-            //isInternetPresent = cd.isConnectingToInternet();
-
-        }*/
-
+        }).start();
     }
 
     private static com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal convertObject(News theNews, String categoryInput) {
@@ -97,79 +98,80 @@ public class NewsRepository {
         return connected;
     }
 
-    public LiveData<List<com.example.android.worldnewsapp.Database.Model.NewsLocal>> getAllNews() {
+    public LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> getAllNews() {
         return allNews;
     }
 
-    public void insertArticles(List<com.example.android.worldnewsapp.Database.Model.NewsLocal> news) {
-        new WorldNewsRepository.InsertArticlesAsyncTask(newsDao).execute(news);
+    public void insertAllArticles(String category, String country) {
+        new InsertAllArticlesAsyncTask(newsDao, category, country).execute();
     }
 
-    public void clearAllArticles() {
-        new WorldNewsRepository.ClearAllArticlesAsyncTask(newsDao).execute();
+    public void clearAllArticles(String category) {
+        new ClearAllArticlesAsyncTask(newsDao, category).execute();
     }
 
-    private List<com.example.android.worldnewsapp.Database.Model.NewsLocal> getNewsFromWebService() {
-        ApiInterface apiService =
-                ApiClient.getClient().create(ApiInterface.class);
-        Call<NewsResponse> call = apiService.getTopHeadlines(country, category, API_KEY);
-        call.enqueue(new Callback<NewsResponse>() {
-            @Override
-            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
-                int statusCode = response.code();
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                    freshNews = response.body().getArticles();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<NewsResponse> call, Throwable t) {
-                // Log error here since request failed
-                Log.e(TAG, t.toString());
-                freshNews = null;
-            }
-        });
-        return (List<com.example.android.worldnewsapp.Database.Model.NewsLocal>) (com.example.android.worldnewsapp.Model.NewsLocal) freshNews;
-    }
+    private static class ClearAllArticlesAsyncTask extends AsyncTask<Void, Integer, Void> {
+        Context context;
+        Dialog dialog;
+        ProgressBar progress;
+        private TheNewsDao newsDao;
+        private String categoryInput;
 
-    public void insertAllArticles() {
-        new WorldNewsRepository.InsertAllArticlesAsyncTask(newsDao).execute();
-    }
-
-    private static class InsertArticlesAsyncTask extends AsyncTask<List<NewsLocal>, Void, Void> {
-        private NewsDao newsDao;
-
-        private InsertArticlesAsyncTask(NewsDao newsDao) {
+        private ClearAllArticlesAsyncTask(TheNewsDao newsDao, String categoryInput) {
             this.newsDao = newsDao;
-        }
-
-        @Override
-        protected Void doInBackground(List<com.example.android.worldnewsapp.Database.Model.NewsLocal>... news) {
-            newsDao.insertArticles(news[0]);
-            return null;
-        }
-    }
-
-    private static class ClearAllArticlesAsyncTask extends AsyncTask<Void, Void, Void> {
-        private NewsDao newsDao;
-
-        private ClearAllArticlesAsyncTask(NewsDao newsDao) {
-            this.newsDao = newsDao;
+            this.categoryInput = categoryInput;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            newsDao.clearAllArticles();
+            newsDao.clearCategoryArticle(categoryInput);
             return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            dialog = new Dialog(context);
+            dialog.setCancelable(true);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.progress_dialog);
+            progress = dialog.findViewById(R.id.progressBar);
+
+            progress.setProgress(0);
+
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progress.setVisibility(View.GONE);
+            dialog.dismiss();
+            Toast.makeText(context, "Finished", Toast.LENGTH_LONG).show();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            progress.setProgress(values[0]);
         }
     }
 
-    private static class InsertAllArticlesAsyncTask extends AsyncTask<Void, Void, Void> {
-        private NewsDao newsDao;
+    private static class InsertAllArticlesAsyncTask extends AsyncTask<Void, Integer, Void> {
+        Context context;
+        Dialog dialog;
+        ProgressBar progress;
+        private TheNewsDao newsDao;
+        private String categoryInput;
+        private String countryInput;
 
-        private InsertAllArticlesAsyncTask(NewsDao newsDao) {
+        private InsertAllArticlesAsyncTask(TheNewsDao newsDao, String categoryInput, String countryInput) {
             this.newsDao = newsDao;
+            this.categoryInput = categoryInput;
+            this.countryInput = countryInput;
         }
 
         @Override
@@ -177,7 +179,7 @@ public class NewsRepository {
             new Thread(() -> {
                 ApiInterface apiService =
                         ApiClient.getClient().create(ApiInterface.class);
-                Call<NewsResponse> call = apiService.getTopHeadlines(country, category, API_KEY);
+                Call<NewsResponse> call = apiService.getTopHeadlines(countryInput, categoryInput, API_KEY);
                 call.enqueue(new Callback<NewsResponse>() {
                     @Override
                     public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
@@ -187,7 +189,7 @@ public class NewsRepository {
                             List<News> freshNews = response.body().getArticles();
                             for (News eachNew : freshNews) {
                                 new Thread(() -> {
-                                    com.example.android.worldnewsapp.Database.Model.NewsLocal oneAtATime = convertObject(eachNew);
+                                    NewsLocal oneAtATime = convertObject(eachNew, categoryInput);
                                     newsDao.insert(oneAtATime);
                                 }).start();
                             }
@@ -204,6 +206,36 @@ public class NewsRepository {
                 });
             }).start();
             return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            dialog = new Dialog(context);
+            dialog.setCancelable(true);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.progress_dialog);
+            progress = dialog.findViewById(R.id.progressBar);
+
+            progress.setProgress(0);
+
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progress.setVisibility(View.GONE);
+            dialog.dismiss();
+            Toast.makeText(context, "Finished", Toast.LENGTH_LONG).show();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            progress.setProgress(values[0]);
         }
     }
 

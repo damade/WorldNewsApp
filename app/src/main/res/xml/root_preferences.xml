@@ -12,4 +12,24 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/other_news_header">
+
+        <DropDownPreference
+            app:dialogTitle="@string/other_news_category_title"
+            app:entries="@array/category_entries"
+            app:entryValues="@array/category_values"
+            app:key="@string/key_dropdown_category_news"
+            app:summary="@string/other_news_category_summary"
+            app:title="@string/other_news_category_title" />
+        <ListPreference
+            app:dialogTitle="@string/other_news_category_title"
+            app:entries="@array/category_entries"
+            app:entryValues="@array/category_values"
+            app:key="@string/key_category_news"
+            app:summary="@string/other_news_category_summary"
+            app:title="@string/other_news_category_title" />
+
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

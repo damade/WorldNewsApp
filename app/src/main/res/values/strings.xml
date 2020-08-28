@@ -14,10 +14,17 @@
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
     <string name="notify_header">Notification Settings</string>
+    <string name="other_news_header">Other News Settings</string>
 
     <!--Notification Preference -->
     <string name="notify_title">Notification</string>
     <string name="notify_summary">Turn this option on or off to get notified</string>
+
+    <!--Other News Category Preference -->
+    <string name="other_news_category_title">Category</string>
+    <string name="other_news_category_summary">Choose the category of news for the other news section</string>
+    <string name="key_category_news">category</string>
+    <string name="key_dropdown_category_news">dropdowncategory</string>
 
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>
