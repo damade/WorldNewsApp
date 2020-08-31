@@ -1,4 +1,4 @@
-package com.example.android.worldnewsapp.SportFragment.SportViewModel;
+package com.example.android.worldnewsapp.Fragments.BusinessFragment.BusinessViewModel;
 
 import android.app.Application;
 
@@ -8,11 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-public class SportViewModelFactory extends ViewModelProvider.AndroidViewModelFactory {
+public class BusinessViewModelFactory extends ViewModelProvider.AndroidViewModelFactory {
     private Application mApplication;
     private String mParam;
 
-    public SportViewModelFactory(@NonNull Application application) {
+    public BusinessViewModelFactory(@NonNull Application application) {
         super(application);
         mApplication = application;
         //mParam = param;
@@ -23,4 +23,3 @@ public class SportViewModelFactory extends ViewModelProvider.AndroidViewModelFac
         return (T) new WorldNewsViewModel(mApplication);
     }
 }
-

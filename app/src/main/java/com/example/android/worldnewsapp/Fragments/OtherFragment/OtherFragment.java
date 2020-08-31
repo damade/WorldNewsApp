@@ -1,4 +1,4 @@
-package com.example.android.worldnewsapp.OtherFragment;
+package com.example.android.worldnewsapp.Fragments.OtherFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.widget.Toast;
 import com.example.android.worldnewsapp.Activity.WebActivity;
 import com.example.android.worldnewsapp.Adapter.FragmentNewsAdapter;
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
-import com.example.android.worldnewsapp.OtherFragment.OtherViewModel.OtherViewModel;
-import com.example.android.worldnewsapp.OtherFragment.OtherViewModel.OtherViewModelFactory;
+import com.example.android.worldnewsapp.Fragments.OtherFragment.OtherViewModel.OtherViewModel;
+import com.example.android.worldnewsapp.Fragments.OtherFragment.OtherViewModel.OtherViewModelFactory;
 import com.example.android.worldnewsapp.R;
 
 import androidx.fragment.app.Fragment;

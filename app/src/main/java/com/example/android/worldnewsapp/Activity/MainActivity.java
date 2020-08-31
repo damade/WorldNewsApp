@@ -7,13 +7,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.EditText;
 
 import com.example.android.worldnewsapp.Adapter.LiveNewsAdapter;
+import com.example.android.worldnewsapp.Adapter.NewsAdapter;
+import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Database.Model.NewsLocal;
+import com.example.android.worldnewsapp.Fragments.HomeFragment;
+import com.example.android.worldnewsapp.Fragments.SearchFragment.SearchFragment;
 import com.example.android.worldnewsapp.Model.LiveNewsResponse;
+import com.example.android.worldnewsapp.Model.News;
+import com.example.android.worldnewsapp.Model.NewsResponse;
 import com.example.android.worldnewsapp.Notifications.NotificationReceiver;
 import com.example.android.worldnewsapp.R;
+import com.example.android.worldnewsapp.Rest.ApiClient;
+import com.example.android.worldnewsapp.Rest.ApiInterface;
 import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
 import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFactory;
 
@@ -21,18 +30,21 @@ import java.util.List;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private final static String country = "gb";
     private final static String category = "sports";
-    private final static String API_KEY = "7bf5a5d4b62e4d1c939e97ebf66167c4";
+    private final static String API_KEY = DatabaseDetails.API_KEY;
 
     private WorldNewsViewModel worldNewsViewModel;
     private WorldNewsViewModelFactory worldNewsViewModelFactory;
@@ -51,54 +63,32 @@ public class MainActivity extends AppCompatActivity {
     private NotificationReceiver mReceiver = new NotificationReceiver();
     private JobScheduler mScheduler;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.custom_toolbar);
-
-        //createNotificationChannel();
-
-        // Register the broadcast receiver to receive the update action from
-        // the notification.
-
-
-        recyclerView = findViewById(R.id.news_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-
-        worldNewsViewModelFactory = new WorldNewsViewModelFactory(getApplication());
-        worldNewsViewModel = new ViewModelProvider(this, worldNewsViewModelFactory).get(WorldNewsViewModel.class);
-
-        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
-        recyclerView.setAdapter(liveNewsAdapter);
-
-        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
-        pullToRefresh.setOnRefreshListener(() -> {
-            worldNewsViewModel.initData();
-            worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
-            pullToRefresh.setRefreshing(false);
-        });
-
-        if (API_KEY.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
-            return;
+    private static String getCategory(String categoryInput) {
+        String categoryOutput = "";
+        switch (categoryInput) {
+            case "Business":
+                categoryOutput = "business";
+                break;
+            case "Entertainment":
+                categoryOutput = "entertainment";
+                break;
+            case "Health":
+                categoryOutput = "health";
+                break;
+            case "Science":
+                categoryOutput = "science";
+                break;
+            case "Sport":
+                categoryOutput = "sports";
+                break;
+            case "Technology":
+                categoryOutput = "technology";
+                break;
+            default:
+                categoryOutput = "general";
+                break;
         }
-
-        worldNewsViewModel.initData();
-        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
-
-        liveNewsAdapter.setOnItemClickListener(new LiveNewsAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(NewsLocal newsLocal) {
-                Intent intent = new Intent(MainActivity.this, WebActivity.class);
-                intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
-                startActivity(intent);
-            }
-        });
-
-
+        return categoryOutput;
     }
 
     @Override
@@ -162,11 +152,119 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*private void loadFragment(Fragment fragment) {
+    private static String getCountryCode(String countryInput) {
+        String countryIsoCode = "";
+        switch (countryInput) {
+            case "China":
+                countryIsoCode = "cn";
+                break;
+            case "Usa":
+                countryIsoCode = "us";
+                break;
+            case "United Kingdom":
+                countryIsoCode = "gb";
+                break;
+            case "Italy":
+                countryIsoCode = "it";
+                break;
+            case "Germany":
+                countryIsoCode = "de";
+                break;
+            case "France":
+                countryIsoCode = "fr";
+                break;
+            default:
+                countryIsoCode = "us";
+                break;
+        }
+        return countryIsoCode;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_toolbar);
+
+        //createNotificationChannel();
+
+        // Register the broadcast receiver to receive the update action from
+        // the notification.
+
+
+        /*recyclerView = findViewById(R.id.news_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        worldNewsViewModelFactory = new WorldNewsViewModelFactory(getApplication());
+        worldNewsViewModel = new ViewModelProvider(this, worldNewsViewModelFactory).get(WorldNewsViewModel.class);
+
+        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
+        recyclerView.setAdapter(liveNewsAdapter);
+
+        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> {
+            worldNewsViewModel.initData();
+            worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
+            pullToRefresh.setRefreshing(false);
+        });
+
+        if (API_KEY.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        worldNewsViewModel.initData();
+        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
+
+        liveNewsAdapter.setOnItemClickListener(new LiveNewsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(NewsLocal newsLocal) {
+                Intent intent = new Intent(MainActivity.this, WebActivity.class);
+                intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
+                startActivity(intent);
+            }
+        });*/
+
+        loadFragment(new HomeFragment());
+
+    }
+
+    private void loadFragment(Fragment fragment) {
         // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
-    }*/
+    }
+
+    public void searchForNews(View view) {
+        EditText source = findViewById(R.id.commonSources);
+        String searchCountry = getCountryCode(SearchFragment.spinnerCountry.getSelectedItem().toString());
+        String searchCategory = getCategory(SearchFragment.spinnerCategory.getSelectedItem().toString());
+        final RecyclerView recyclerView = findViewById(R.id.sport_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        ApiInterface apiService =
+                ApiClient.getClient().create(ApiInterface.class);
+
+        Call<NewsResponse> call = apiService.getTopHeadlines(searchCountry, searchCategory, API_KEY);
+        call.enqueue(new Callback<NewsResponse>() {
+            @Override
+            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                int statusCode = response.code();
+                List<News> news = response.body().getArticles();
+                NewsAdapter newsAdapter = new NewsAdapter(news, R.layout.list_item_news, getApplicationContext());
+                recyclerView.setAdapter(newsAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<NewsResponse> call, Throwable t) {
+                // Log error here since request failed
+                Log.e(TAG, t.toString());
+            }
+        });
+    }
 }

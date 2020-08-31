@@ -1,4 +1,4 @@
-package com.example.android.worldnewsapp.BusinessFragment.BusinessViewModel;
+package com.example.android.worldnewsapp.Fragments.SportFragment.SportViewModel;
 
 import android.app.Application;
 
@@ -11,13 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-public class BusinessViewModel extends AndroidViewModel {
-    private final static String country = "us";
-    private LiveData<List<NewsLocal>> allNews;
-    private final static String category = "business";
+public class SportViewModel extends AndroidViewModel {
+    private final static String country = "gb";
+    private final static String category = "sports";
     private NewsRepository repository;
+    private LiveData<List<NewsLocal>> allNews;
 
-    public BusinessViewModel(@NonNull Application application) {
+    public SportViewModel(@NonNull Application application) {
         super(application);
         repository = new NewsRepository(application, category, country);
         allNews = repository.getAllNews();

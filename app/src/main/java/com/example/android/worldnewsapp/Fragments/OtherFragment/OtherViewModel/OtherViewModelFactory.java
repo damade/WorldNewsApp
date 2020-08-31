@@ -1,4 +1,4 @@
-package com.example.android.worldnewsapp.OtherFragment.OtherViewModel;
+package com.example.android.worldnewsapp.Fragments.OtherFragment.OtherViewModel;
 
 import android.app.Application;
 
