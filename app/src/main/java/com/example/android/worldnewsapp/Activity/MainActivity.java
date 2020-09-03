@@ -1,7 +1,5 @@
 package com.example.android.worldnewsapp.Activity;
 
-import android.app.NotificationManager;
-import android.app.job.JobScheduler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,26 +8,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.android.worldnewsapp.Adapter.LiveNewsAdapter;
 import com.example.android.worldnewsapp.Adapter.NewsAdapter;
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
-import com.example.android.worldnewsapp.Database.Model.NewsLocal;
-import com.example.android.worldnewsapp.Fragments.HomeFragment;
+import com.example.android.worldnewsapp.Fragments.BusinessFragment.BusinessFragment;
+import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeFragment;
+import com.example.android.worldnewsapp.Fragments.OtherFragment.OtherFragment;
 import com.example.android.worldnewsapp.Fragments.SearchFragment.SearchFragment;
+import com.example.android.worldnewsapp.Fragments.SportFragment.SportFragment;
 import com.example.android.worldnewsapp.Model.LiveNewsResponse;
 import com.example.android.worldnewsapp.Model.News;
 import com.example.android.worldnewsapp.Model.NewsResponse;
-import com.example.android.worldnewsapp.Notifications.NotificationReceiver;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.Rest.ApiClient;
 import com.example.android.worldnewsapp.Rest.ApiInterface;
+import com.example.android.worldnewsapp.Utils.BottomNavigationBehaviour;
 import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
 import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
@@ -49,19 +51,11 @@ public class MainActivity extends AppCompatActivity {
     private WorldNewsViewModel worldNewsViewModel;
     private WorldNewsViewModelFactory worldNewsViewModelFactory;
     private LiveData<List<LiveNewsResponse>> theNewsList;
-    // Constants for the notification actions buttons.
-    private static final String ACTION_UPDATE_NOTIFICATION =
-            "com.example.android.worldnewsapp.ACTION_UPDATE_NOTIFICATION";
-    // Notification channel ID.
-    private static final String PRIMARY_CHANNEL_ID =
-            "primary_notification_channel";
-    // Notification ID.
-    private static final int NOTIFICATION_ID = 0;
-    private static final int JOB_ID = 0;
+
     private RecyclerView recyclerView;
-    private NotificationManager mNotifyManager;
-    private NotificationReceiver mReceiver = new NotificationReceiver();
-    private JobScheduler mScheduler;
+
+
+    private ActionBar toolbar;
 
     private static String getCategory(String categoryInput) {
         String categoryOutput = "";
@@ -115,11 +109,48 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment fragment;
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    toolbar.setTitle("Home");
+                    fragment = new HomeFragment();
+                    loadFragment(fragment);
+                    return true;
+                case R.id.navigation_search:
+                    toolbar.setTitle("Search");
+                    fragment = new SearchFragment();
+                    loadFragment(fragment);
+                    return true;
+                case R.id.navigation_business:
+                    toolbar.setTitle("Business");
+                    fragment = new BusinessFragment();
+                    loadFragment(fragment);
+                    return true;
+                case R.id.navigation_sports:
+                    toolbar.setTitle("Sport");
+                    fragment = new SportFragment();
+                    loadFragment(fragment);
+                    return true;
+                case R.id.navigation_others:
+                    toolbar.setTitle("Others");
+                    fragment = new OtherFragment();
+                    loadFragment(fragment);
+                    return true;
+            }
+            return false;
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
 
-        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
+        /*final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
         recyclerView.setAdapter(liveNewsAdapter);
         worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
         liveNewsAdapter.setOnItemClickListener(new LiveNewsAdapter.OnItemClickListener() {
@@ -129,26 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
                 startActivity(intent);
             }
-        });
-
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(MainActivity.class.getSimpleName(), "Does it display the note");
-
-        final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
-        recyclerView.setAdapter(liveNewsAdapter);
-        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
-        liveNewsAdapter.setOnItemClickListener(new LiveNewsAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(NewsLocal newsLocal) {
-                Intent intent = new Intent(MainActivity.this, WebActivity.class);
-                intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
-                startActivity(intent);
-            }
-        });
+        });*/
 
     }
 
@@ -181,11 +193,68 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(MainActivity.class.getSimpleName(), "Does it display the note");
+
+        /*final LiveNewsAdapter liveNewsAdapter = new LiveNewsAdapter();
+        recyclerView.setAdapter(liveNewsAdapter);
+        worldNewsViewModel.getAllNews().observe(this, liveNews -> liveNewsAdapter.submitList(liveNews));
+        liveNewsAdapter.setOnItemClickListener(new LiveNewsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(NewsLocal newsLocal) {
+                Intent intent = new Intent(MainActivity.this, WebActivity.class);
+                intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
+                startActivity(intent);
+            }
+        });*/
+
+    }
+
+    private void loadFragment(Fragment fragment) {
+        // load fragment
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public void searchForNews(View view) {
+        EditText source = findViewById(R.id.commonSources);
+        String searchCountry = getCountryCode(SearchFragment.spinnerCountry.getSelectedItem().toString());
+        String searchCategory = getCategory(SearchFragment.spinnerCategory.getSelectedItem().toString());
+        final RecyclerView recyclerView = findViewById(R.id.sport_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        ApiInterface apiService =
+                ApiClient.getClient().create(ApiInterface.class);
+
+        Call<NewsResponse> call = apiService.getTopHeadlines(searchCountry, searchCategory, API_KEY);
+        call.enqueue(new Callback<NewsResponse>() {
+            @Override
+            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                int statusCode = response.code();
+                List<News> news = response.body().getArticles();
+                NewsAdapter newsAdapter = new NewsAdapter(news, R.layout.list_item_news, getApplicationContext());
+                recyclerView.setAdapter(newsAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<NewsResponse> call, Throwable t) {
+                // Log error here since request failed
+                Log.e(TAG, t.toString());
+            }
+        });
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.custom_toolbar);
+        toolbar = getSupportActionBar();
+        toolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        toolbar.setCustomView(R.layout.custom_toolbar);
 
         //createNotificationChannel();
 
@@ -227,44 +296,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
+        BottomNavigationView navigation = findViewById(R.id.bottomBar);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        // attaching bottom sheet behaviour - hide / show on scroll
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) navigation.getLayoutParams();
+        layoutParams.setBehavior(new BottomNavigationBehaviour());
+
         loadFragment(new HomeFragment());
 
-    }
-
-    private void loadFragment(Fragment fragment) {
-        // load fragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    public void searchForNews(View view) {
-        EditText source = findViewById(R.id.commonSources);
-        String searchCountry = getCountryCode(SearchFragment.spinnerCountry.getSelectedItem().toString());
-        String searchCategory = getCategory(SearchFragment.spinnerCategory.getSelectedItem().toString());
-        final RecyclerView recyclerView = findViewById(R.id.sport_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-
-        ApiInterface apiService =
-                ApiClient.getClient().create(ApiInterface.class);
-
-        Call<NewsResponse> call = apiService.getTopHeadlines(searchCountry, searchCategory, API_KEY);
-        call.enqueue(new Callback<NewsResponse>() {
-            @Override
-            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
-                int statusCode = response.code();
-                List<News> news = response.body().getArticles();
-                NewsAdapter newsAdapter = new NewsAdapter(news, R.layout.list_item_news, getApplicationContext());
-                recyclerView.setAdapter(newsAdapter);
-            }
-
-            @Override
-            public void onFailure(Call<NewsResponse> call, Throwable t) {
-                // Log error here since request failed
-                Log.e(TAG, t.toString());
-            }
-        });
     }
 }

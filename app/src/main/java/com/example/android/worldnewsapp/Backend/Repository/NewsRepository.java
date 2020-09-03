@@ -56,16 +56,17 @@ public class NewsRepository {
             /*if (webServiceNews == null) {
                 webServiceNews = getNewsFromWebService();
             }*/
-            if (CheckConnectivity(application)) {
-                clearAllArticles(category);
-                insertAllArticles(category, country);
-            } else {
-                if (allNews == null) {
-                    clearAllArticles(category);
-                    insertAllArticles(category, country);
-                }
+
+            if (allNews == null) {
+                initData(category, country);
             }
+
         }).start();
+    }
+
+    private void initData(String category, String country) {
+        clearAllArticles(category);
+        insertAllArticles(category, country);
     }
 
     private static com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal convertObject(News theNews, String categoryInput) {
@@ -102,7 +103,7 @@ public class NewsRepository {
         return allNews;
     }
 
-    public void insertAllArticles(String category, String country) {
+    private void insertAllArticles(String category, String country) {
         new InsertAllArticlesAsyncTask(newsDao, category, country).execute();
     }
 

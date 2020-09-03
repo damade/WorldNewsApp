@@ -1,4 +1,4 @@
-package com.example.android.worldnewsapp.Fragments;
+package com.example.android.worldnewsapp.Fragments.HomeFragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
