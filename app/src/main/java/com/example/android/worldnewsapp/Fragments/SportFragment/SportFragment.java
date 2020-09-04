@@ -13,6 +13,8 @@ import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.SportFragment.SportViewModel.SportViewModel;
 import com.example.android.worldnewsapp.Fragments.SportFragment.SportViewModel.SportViewModelFactory;
 import com.example.android.worldnewsapp.R;
+import com.example.android.worldnewsapp.Utils.AlertDialogManager;
+import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -38,6 +40,14 @@ public class SportFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    Boolean isInternetPresent = false;
+
+    // Connection detector class
+    ConnectionDetector cd;
+
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
 
     public SportFragment() {
         // Required empty public constructor
@@ -87,10 +97,17 @@ public class SportFragment extends Fragment {
         final FragmentNewsAdapter liveNewsAdapter = new FragmentNewsAdapter();
         recyclerView.setAdapter(liveNewsAdapter);
 
-        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.pullToRefresh);
+        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.sport_recycler_view);
         pullToRefresh.setOnRefreshListener(() -> {
-            sportViewModel.initData();
-            sportViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
+            cd = new ConnectionDetector(getContext().getApplicationContext());
+
+            // Check if Internet present
+            isInternetPresent = cd.isConnectingToInternet();
+            if (isInternetPresent) {
+                sportViewModel.initData();
+                sportViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
+                pullToRefresh.setRefreshing(false);
+            }
             pullToRefresh.setRefreshing(false);
         });
 
@@ -98,7 +115,7 @@ public class SportFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
         }
 
-        sportViewModel.initData();
+        //sportViewModel.initData();
         sportViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
 
         liveNewsAdapter.setOnItemClickListener(newsLocal -> {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="vertical_margin">16dp</dimen>
+    <dimen name="edit_button_margin">8dp</dimen>
+    <dimen name="edit_button_height">32dp</dimen>
+    <dimen name="edit_button_width">32dp</dimen>
+    <dimen name="horizontal_margin">8dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
+    <dimen name="first_layout_text_size">18sp</dimen>
+    <dimen name="question_horizontal_margin">32dp</dimen>
+    <dimen name="question_vertical_margin">8dp</dimen>
+    <dimen name="layout_text_size">16sp</dimen>
+    <dimen name="question_text_size">30sp</dimen>
+    <dimen name="view_recent">20sp</dimen>
+    <dimen name="image_header_height">192dp</dimen>
+    <dimen name="game_over_height">350dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!--Map Screen-->
+    <dimen name="map_height">100dp</dimen>
+    <dimen name="address_size">25sp</dimen>
+    <dimen name="update_size">20sp</dimen>
+    <dimen name="update_address">15sp</dimen>
+    <dimen name="update_timestamp">10sp</dimen>
+    <dimen name="leaderboard_place">20sp</dimen>
+    <dimen name="leaderboard_value">25sp</dimen>
+</resources>

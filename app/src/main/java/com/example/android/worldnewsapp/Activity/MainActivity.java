@@ -12,6 +12,8 @@ import com.example.android.worldnewsapp.Adapter.NewsAdapter;
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.BusinessFragment.BusinessFragment;
 import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeFragment;
+import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel.HomeViewModel;
+import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel.HomeViewModelFactory;
 import com.example.android.worldnewsapp.Fragments.OtherFragment.OtherFragment;
 import com.example.android.worldnewsapp.Fragments.SearchFragment.SearchFragment;
 import com.example.android.worldnewsapp.Fragments.SportFragment.SportFragment;
@@ -21,7 +23,9 @@ import com.example.android.worldnewsapp.Model.NewsResponse;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.Rest.ApiClient;
 import com.example.android.worldnewsapp.Rest.ApiInterface;
+import com.example.android.worldnewsapp.Utils.AlertDialogManager;
 import com.example.android.worldnewsapp.Utils.BottomNavigationBehaviour;
+import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
 import com.example.android.worldnewsapp.ViewModelFactory.WorldNewsViewModelFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -35,6 +39,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
@@ -50,9 +55,18 @@ public class MainActivity extends AppCompatActivity {
 
     private WorldNewsViewModel worldNewsViewModel;
     private WorldNewsViewModelFactory worldNewsViewModelFactory;
+
+    Boolean isInternetPresent = false;
+    // Connection detector class
+    ConnectionDetector cd;
+
     private LiveData<List<LiveNewsResponse>> theNewsList;
 
     private RecyclerView recyclerView;
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
+    private HomeViewModel homeViewModel;
+    private HomeViewModelFactory homeViewModelFactory;
 
 
     private ActionBar toolbar;
@@ -248,6 +262,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void viewAllNews(View view) {
+        EditText source = findViewById(R.id.commonSources);
+        String searchCountry = getCountryCode(SearchFragment.spinnerCountry.getSelectedItem().toString());
+        String searchCategory = getCategory(SearchFragment.spinnerCategory.getSelectedItem().toString());
+        final RecyclerView recyclerView = findViewById(R.id.sport_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        ApiInterface apiService =
+                ApiClient.getClient().create(ApiInterface.class);
+
+        Call<NewsResponse> call = apiService.getTopHeadlines(searchCountry, searchCategory, API_KEY);
+        call.enqueue(new Callback<NewsResponse>() {
+            @Override
+            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                int statusCode = response.code();
+                List<News> news = response.body().getArticles();
+                NewsAdapter newsAdapter = new NewsAdapter(news, R.layout.list_item_news, getApplicationContext());
+                recyclerView.setAdapter(newsAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<NewsResponse> call, Throwable t) {
+                // Log error here since request failed
+                Log.e(TAG, t.toString());
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -295,6 +338,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });*/
+
+        homeViewModelFactory = new HomeViewModelFactory(getApplication());
+        homeViewModel = new ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel.class);
+
+        cd = new ConnectionDetector(getApplicationContext());
+
+        // Check if Internet present
+        isInternetPresent = cd.isConnectingToInternet();
+        if (isInternetPresent) {
+            homeViewModel.initData();
+        }
 
         BottomNavigationView navigation = findViewById(R.id.bottomBar);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

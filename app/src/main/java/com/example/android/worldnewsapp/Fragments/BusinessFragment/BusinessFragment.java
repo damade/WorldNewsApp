@@ -13,6 +13,8 @@ import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.BusinessFragment.BusinessViewModel.BusinessViewModel;
 import com.example.android.worldnewsapp.Fragments.BusinessFragment.BusinessViewModel.BusinessViewModelFactory;
 import com.example.android.worldnewsapp.R;
+import com.example.android.worldnewsapp.Utils.AlertDialogManager;
+import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -31,6 +33,15 @@ public class BusinessFragment extends Fragment {
     private BusinessViewModel businessNewsViewModel;
     private BusinessViewModelFactory businessNewsViewModelFactory;
     private RecyclerView recyclerView;
+
+
+    Boolean isInternetPresent = false;
+
+    // Connection detector class
+    ConnectionDetector cd;
+
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -90,10 +101,17 @@ public class BusinessFragment extends Fragment {
         final FragmentNewsAdapter liveNewsAdapter = new FragmentNewsAdapter();
         recyclerView.setAdapter(liveNewsAdapter);
 
-        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.pullToRefresh);
+        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.businessPullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
-            businessNewsViewModel.initData();
-            businessNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
+            cd = new ConnectionDetector(getContext().getApplicationContext());
+
+            // Check if Internet present
+            isInternetPresent = cd.isConnectingToInternet();
+            if (isInternetPresent) {
+                businessNewsViewModel.initData();
+                businessNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
+                pullToRefresh.setRefreshing(false);
+            }
             pullToRefresh.setRefreshing(false);
         });
 
@@ -101,7 +119,7 @@ public class BusinessFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
         }
 
-        businessNewsViewModel.initData();
+        //businessNewsViewModel.initData();
         businessNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
 
         liveNewsAdapter.setOnItemClickListener(newsLocal -> {

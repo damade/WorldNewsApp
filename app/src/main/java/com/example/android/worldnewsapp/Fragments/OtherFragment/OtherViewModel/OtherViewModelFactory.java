@@ -2,8 +2,6 @@ package com.example.android.worldnewsapp.Fragments.OtherFragment.OtherViewModel;
 
 import android.app.Application;
 
-import com.example.android.worldnewsapp.ViewModel.WorldNewsViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,6 +18,6 @@ public class OtherViewModelFactory extends ViewModelProvider.AndroidViewModelFac
 
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new WorldNewsViewModel(mApplication);
+        return (T) new OtherViewModel(mApplication);
     }
 }

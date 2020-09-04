@@ -11,6 +11,11 @@
     <string name="action_open_chrome">Open in Chrome</string>
     <string name="spinner_category">Category</string>
     <string name="spinner_country">Country</string>
+    <string name="general">General</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="top_sport_news">Top Sport News</string>
+    <string name="top_business_news">Top Business News</string>
+    <string name="action_view_all"><b><u>View all>></u></b></string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

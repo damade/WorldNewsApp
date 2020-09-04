@@ -1,13 +1,27 @@
 package com.example.android.worldnewsapp.Fragments.HomeFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.android.worldnewsapp.Activity.WebActivity;
+import com.example.android.worldnewsapp.Adapter.FragmentNewsAdapter;
+import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
+import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel.HomeViewModel;
+import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel.HomeViewModelFactory;
 import com.example.android.worldnewsapp.R;
+import com.example.android.worldnewsapp.Utils.AlertDialogManager;
+import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,6 +29,20 @@ import androidx.fragment.app.Fragment;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+
+    private final static String API_KEY = DatabaseDetails.API_KEY;
+    Boolean isInternetPresent = false;
+    // Connection detector class
+    ConnectionDetector cd;
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
+    private HomeViewModel homeViewModel;
+    private HomeViewModelFactory homeViewModelFactory;
+    private RecyclerView generalRecyclerView;
+    private RecyclerView entertainmentRecyclerView;
+    private RecyclerView topSportRecyclerView;
+    private RecyclerView topBusinessRecyclerView;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,6 +88,100 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View RootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        generalRecyclerView = RootView.findViewById(R.id.general_recycler_view);
+        generalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        generalRecyclerView.setHasFixedSize(true);
+
+        entertainmentRecyclerView = RootView.findViewById(R.id.entertainment_recycler_view);
+        entertainmentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        entertainmentRecyclerView.setHasFixedSize(true);
+
+        topBusinessRecyclerView = RootView.findViewById(R.id.top_business_recycler_view);
+        topBusinessRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        topBusinessRecyclerView.setHasFixedSize(true);
+
+        topSportRecyclerView = RootView.findViewById(R.id.business_recycler_view);
+        topSportRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        topSportRecyclerView.setHasFixedSize(true);
+
+
+        homeViewModelFactory = new HomeViewModelFactory(getActivity().getApplication());
+        homeViewModel = new ViewModelProvider(this, homeViewModelFactory)
+                .get(HomeViewModel.class);
+
+        final FragmentNewsAdapter generalLiveNewsAdapter = new FragmentNewsAdapter();
+        final FragmentNewsAdapter entertainmentLiveNewsAdapter = new FragmentNewsAdapter();
+        final FragmentNewsAdapter businessLiveNewsAdapter = new FragmentNewsAdapter();
+        final FragmentNewsAdapter sportLiveNewsAdapter = new FragmentNewsAdapter();
+
+        generalRecyclerView.setAdapter(generalLiveNewsAdapter);
+        entertainmentRecyclerView.setAdapter(entertainmentLiveNewsAdapter);
+        topBusinessRecyclerView.setAdapter(businessLiveNewsAdapter);
+        topSportRecyclerView.setAdapter(sportLiveNewsAdapter);
+
+
+        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.homePullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> {
+
+            cd = new ConnectionDetector(getContext().getApplicationContext());
+
+            // Check if Internet present
+            isInternetPresent = cd.isConnectingToInternet();
+            if (isInternetPresent) {
+                homeViewModel.initData();
+                homeViewModel.getAllGeneralNews().observe(getViewLifecycleOwner(), newsLocals -> generalLiveNewsAdapter.submitList(newsLocals));
+                homeViewModel.getAllEntertainmentNews().observe(getViewLifecycleOwner(), newsLocals -> entertainmentLiveNewsAdapter.submitList(newsLocals));
+                homeViewModel.getAllTopBusinessNews().observe(getViewLifecycleOwner(), newsLocals -> businessLiveNewsAdapter.submitList(newsLocals));
+                homeViewModel.getAllTopSportNews().observe(getViewLifecycleOwner(), newsLocals -> sportLiveNewsAdapter.submitList(newsLocals));
+                pullToRefresh.setRefreshing(false);
+            }
+            pullToRefresh.setRefreshing(false);
+        });
+
+        if (API_KEY.isEmpty()) {
+            Toast.makeText(getActivity().getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
+        }
+
+        //homeViewModel.initData();
+        homeViewModel.getAllGeneralNews().observe(getViewLifecycleOwner(), newsLocals -> generalLiveNewsAdapter.submitList(newsLocals));
+        homeViewModel.getAllEntertainmentNews().observe(getViewLifecycleOwner(), newsLocals -> entertainmentLiveNewsAdapter.submitList(newsLocals));
+        homeViewModel.getAllTopBusinessNews().observe(getViewLifecycleOwner(), newsLocals -> businessLiveNewsAdapter.submitList(newsLocals));
+        homeViewModel.getAllTopSportNews().observe(getViewLifecycleOwner(), newsLocals -> sportLiveNewsAdapter.submitList(newsLocals));
+
+
+        generalLiveNewsAdapter.setOnItemClickListener(newsLocal -> {
+            Intent intent = new Intent(getActivity(), WebActivity.class);
+            intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
+            startActivity(intent);
+        });
+
+        entertainmentLiveNewsAdapter.setOnItemClickListener(newsLocal -> {
+            Intent intent = new Intent(getActivity(), WebActivity.class);
+            intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
+            startActivity(intent);
+        });
+
+        businessLiveNewsAdapter.setOnItemClickListener(newsLocal -> {
+            Intent intent = new Intent(getActivity(), WebActivity.class);
+            intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
+            startActivity(intent);
+        });
+
+        sportLiveNewsAdapter.setOnItemClickListener(newsLocal -> {
+            Intent intent = new Intent(getActivity(), WebActivity.class);
+            intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
+            startActivity(intent);
+        });
+
+
+        return RootView;
     }
+
+
+    public void viewAllNews(View view) {
+
+    }
+
 }

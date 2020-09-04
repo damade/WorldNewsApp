@@ -13,6 +13,8 @@ import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.OtherFragment.OtherViewModel.OtherViewModel;
 import com.example.android.worldnewsapp.Fragments.OtherFragment.OtherViewModel.OtherViewModelFactory;
 import com.example.android.worldnewsapp.R;
+import com.example.android.worldnewsapp.Utils.AlertDialogManager;
+import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -39,6 +41,14 @@ public class OtherFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    Boolean isInternetPresent = false;
+
+    // Connection detector class
+    ConnectionDetector cd;
+
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
 
     public OtherFragment() {
         // Required empty public constructor
@@ -89,10 +99,17 @@ public class OtherFragment extends Fragment {
 
         recyclerView.setAdapter(liveNewsAdapter);
 
-        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.pullToRefresh);
+        final SwipeRefreshLayout pullToRefresh = RootView.findViewById(R.id.othersPullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> {
-            otherNewsViewModel.initData();
-            otherNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
+            cd = new ConnectionDetector(getContext().getApplicationContext());
+
+            // Check if Internet present
+            isInternetPresent = cd.isConnectingToInternet();
+            if (isInternetPresent) {
+                otherNewsViewModel.initData();
+                otherNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
+                pullToRefresh.setRefreshing(false);
+            }
             pullToRefresh.setRefreshing(false);
         });
 
@@ -100,7 +117,7 @@ public class OtherFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Please obtain your API KEY from newsapi.org first!", Toast.LENGTH_LONG).show();
         }
 
-        otherNewsViewModel.initData();
+        //otherNewsViewModel.initData();
         otherNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
 
         liveNewsAdapter.setOnItemClickListener(newsLocal -> {
@@ -118,7 +135,7 @@ public class OtherFragment extends Fragment {
         super.onResume();
 
         //recyclerView.setAdapter(liveNewsAdapter);
-        otherNewsViewModel.initData();
+        //otherNewsViewModel.initData();
         /*otherNewsViewModel.getAllNews().observe(getViewLifecycleOwner(), liveNews -> liveNewsAdapter.submitList(liveNews));
 
         liveNewsAdapter.setOnItemClickListener(newsLocal -> {

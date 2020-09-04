@@ -25,6 +25,7 @@ import com.example.android.worldnewsapp.Rest.ApiInterface;
 import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 
 import java.util.List;
+import java.util.Map;
 
 import androidx.lifecycle.LiveData;
 import retrofit2.Call;
@@ -46,6 +47,11 @@ public class NewsRepository {
     private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> allNews;
     private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> topTenNews;
 
+    private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> allGeneral;
+    private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> allEntertainment;
+    private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> allTopBusiness;
+    private LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> allTopSport;
+
 
     public NewsRepository(Application application, String category, String country) {
         NewsDatabase newsDatabase = NewsDatabase.getInstance(application);
@@ -64,9 +70,39 @@ public class NewsRepository {
         }).start();
     }
 
-    private void initData(String category, String country) {
+    public NewsRepository(Application application) {
+        NewsDatabase newsDatabase = NewsDatabase.getInstance(application);
+        new Thread(() -> {
+            newsDao = newsDatabase.newsDao();
+            allGeneral = newsDao.getCategoryNewsArticles("general");
+            allEntertainment = newsDao.getCategoryNewsArticles("entertainment");
+            allTopBusiness = newsDao.getTopTenCategoryNewsArticles("business");
+            allTopSport = newsDao.getTopTenCategoryNewsArticles("sports");
+            /*if (webServiceNews == null) {
+                webServiceNews = getNewsFromWebService();
+            }*/
+
+        }).start();
+    }
+
+    public NewsRepository() {
+    }
+
+
+    public void initData(String category, String country) {
         clearAllArticles(category);
         insertAllArticles(category, country);
+    }
+
+    public void initData(Map<String, String> input) {
+        new Thread(() -> {
+            for (Map.Entry<String, String> entry : input.entrySet()) {
+                String category = entry.getKey();
+                String country = entry.getValue();
+                clearAllArticles(category);
+                insertAllArticles(category, country);
+            }
+        }).start();
     }
 
     private static com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal convertObject(News theNews, String categoryInput) {
@@ -103,11 +139,32 @@ public class NewsRepository {
         return allNews;
     }
 
+    public LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> getTopNews() {
+        return topTenNews;
+    }
+
+    public LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> getGeneralNews() {
+        return allGeneral;
+    }
+
+    public LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> getEntertainmentNews() {
+        return allEntertainment;
+    }
+
+    public LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> getTopSportNews() {
+        return allTopSport;
+    }
+
+    public LiveData<List<com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal>> getTopBusinessNews() {
+        return allTopBusiness;
+    }
+
+
     private void insertAllArticles(String category, String country) {
         new InsertAllArticlesAsyncTask(newsDao, category, country).execute();
     }
 
-    public void clearAllArticles(String category) {
+    private void clearAllArticles(String category) {
         new ClearAllArticlesAsyncTask(newsDao, category).execute();
     }
 
@@ -130,7 +187,7 @@ public class NewsRepository {
             return null;
         }
 
-        @Override
+        /*@Override
         protected void onPreExecute() {
             super.onPreExecute();
 
@@ -158,7 +215,8 @@ public class NewsRepository {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
             progress.setProgress(values[0]);
-        }
+        }*/
+
     }
 
     private static class InsertAllArticlesAsyncTask extends AsyncTask<Void, Integer, Void> {

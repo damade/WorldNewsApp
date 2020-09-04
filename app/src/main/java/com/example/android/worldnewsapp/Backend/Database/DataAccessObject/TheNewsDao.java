@@ -36,7 +36,7 @@ public interface TheNewsDao {
     @Insert
     void insertArticles(List<NewsLocal> articles);
 
-    @Query("DELETE FROM news_table")
+    @Query("DELETE FROM the_news_table")
     void clearAllArticles();
 
     @Transaction
