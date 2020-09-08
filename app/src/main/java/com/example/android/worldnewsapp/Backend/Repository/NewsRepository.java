@@ -1,16 +1,23 @@
 package com.example.android.worldnewsapp.Backend.Repository;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 
 import com.example.android.worldnewsapp.Backend.Database.DataAccessObject.TheNewsDao;
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
@@ -27,7 +34,6 @@ import com.example.android.worldnewsapp.Utils.ConnectionDetector;
 import java.util.List;
 import java.util.Map;
 
-import androidx.lifecycle.LiveData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,7 +70,7 @@ public class NewsRepository {
             }*/
 
             if (allNews == null) {
-                initData(category, country);
+                initData(category, country, application);
             }
 
         }).start();
@@ -89,18 +95,18 @@ public class NewsRepository {
     }
 
 
-    public void initData(String category, String country) {
+    public void initData(String category, String country, Application application) {
         clearAllArticles(category);
-        insertAllArticles(category, country);
+        insertAllArticles(category, country, application);
     }
 
-    public void initData(Map<String, String> input) {
+    public void initData(Map<String, String> input, Application application) {
         new Thread(() -> {
             for (Map.Entry<String, String> entry : input.entrySet()) {
                 String category = entry.getKey();
                 String country = entry.getValue();
                 clearAllArticles(category);
-                insertAllArticles(category, country);
+                insertAllArticles(category, country, application);
             }
         }).start();
     }
@@ -160,8 +166,8 @@ public class NewsRepository {
     }
 
 
-    private void insertAllArticles(String category, String country) {
-        new InsertAllArticlesAsyncTask(newsDao, category, country).execute();
+    private void insertAllArticles(String category, String country, Application application) {
+        new InsertAllArticlesAsyncTask(newsDao, category, country, application).execute();
     }
 
     private void clearAllArticles(String category) {
@@ -220,17 +226,28 @@ public class NewsRepository {
     }
 
     private static class InsertAllArticlesAsyncTask extends AsyncTask<Void, Integer, Void> {
-        Context context;
-        Dialog dialog;
-        ProgressBar progress;
+        Application application;
         private TheNewsDao newsDao;
         private String categoryInput;
         private String countryInput;
+        private Looper looper;
+        final int MSG = 1;
+        final int DETACH = 2;
+        final int PROGRESS = 3;
 
-        private InsertAllArticlesAsyncTask(TheNewsDao newsDao, String categoryInput, String countryInput) {
+        //ProgressBar progress = dialog.findViewById(R.id.progressBar);
+        @SuppressLint("StaticFieldLeak")
+        Context context;
+
+        private InsertAllArticlesAsyncTask(TheNewsDao newsDao, String categoryInput, String countryInput, Application application) {
             this.newsDao = newsDao;
             this.categoryInput = categoryInput;
             this.countryInput = countryInput;
+            this.application = application;
+            this.context = application.getBaseContext();
+//            this.dialog = new Dialog(application.getBaseContext());
+            //this.dialog = new Dialog(application.getBaseContext());
+
         }
 
         @Override
@@ -270,23 +287,13 @@ public class NewsRepository {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            dialog = new Dialog(context);
-            dialog.setCancelable(true);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.progress_dialog);
-            progress = dialog.findViewById(R.id.progressBar);
-
-            progress.setProgress(0);
-
-            dialog.show();
+            theHandler(application, 0).sendEmptyMessage(MSG);
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progress.setVisibility(View.GONE);
-            dialog.dismiss();
+            theHandler(application, 0).sendEmptyMessage(DETACH);
             Toast.makeText(context, "Finished", Toast.LENGTH_LONG).show();
 
         }
@@ -294,8 +301,37 @@ public class NewsRepository {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            progress.setProgress(values[0]);
+            theHandler(application,values[0]).sendEmptyMessage(PROGRESS);
         }
+    }
+
+    private static Handler theHandler(Application application, int value) {
+        Looper.prepareMainLooper();
+        final  Dialog dialog = new Dialog(application.getBaseContext());
+        final ProgressBar progress = dialog.findViewById(R.id.progressBar);
+        return new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message message) {
+                switch (message.what) {
+                    case 1:
+                        dialog.setCancelable(true);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.progress_dialog);
+                        progress.setProgress(0);
+                        dialog.show();
+                        break;
+                    case 2:
+
+                        progress.setVisibility(View.GONE);
+                        dialog.dismiss();
+                        break;
+                    case 3:
+                        progress.setProgress(value);
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
 }

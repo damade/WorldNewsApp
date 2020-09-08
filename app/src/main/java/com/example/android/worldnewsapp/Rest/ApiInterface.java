@@ -19,4 +19,5 @@ public interface ApiInterface {
     /*@GET("top-headlines")
     Call<LiveNewsResponse> getTopHeadlines(@Query("country") String country, @Query("category") String category, @Query("apiKey") String apiKey);*/
 
+
 }

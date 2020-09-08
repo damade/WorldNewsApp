@@ -2,16 +2,16 @@ package com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
 import com.example.android.worldnewsapp.Backend.Database.Model.NewsLocal;
 import com.example.android.worldnewsapp.Backend.Repository.NewsRepository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 
 public class HomeViewModel extends AndroidViewModel {
     private NewsRepository repository;
@@ -40,7 +40,7 @@ public class HomeViewModel extends AndroidViewModel {
         query.put("business", "us");
         query.put("sports", "gb");
         NewsRepository repository = new NewsRepository();
-        repository.initData(query);
+        repository.initData(query,getApplication());
     }
 
 
