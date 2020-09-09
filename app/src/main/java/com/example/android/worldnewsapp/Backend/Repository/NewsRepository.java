@@ -193,7 +193,7 @@ public class NewsRepository {
             return null;
         }
 
-        /*@Override
+        @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
@@ -221,7 +221,7 @@ public class NewsRepository {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
             progress.setProgress(values[0]);
-        }*/
+        }
 
     }
 
