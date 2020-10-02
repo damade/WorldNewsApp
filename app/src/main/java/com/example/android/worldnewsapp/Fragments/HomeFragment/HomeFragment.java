@@ -1,27 +1,19 @@
 package com.example.android.worldnewsapp.Fragments.HomeFragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.android.worldnewsapp.Activity.WebActivity;
-import com.example.android.worldnewsapp.Adapter.FragmentNewsAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel.HomeViewModel;
 import com.example.android.worldnewsapp.Fragments.HomeFragment.HomeViewModel.HomeViewModelFactory;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.Utils.AlertDialogManager;
 import com.example.android.worldnewsapp.Utils.ConnectionDetector;
-
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -90,7 +82,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View RootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        generalRecyclerView = RootView.findViewById(R.id.general_recycler_view);
+        /*generalRecyclerView = RootView.findViewById(R.id.general_recycler_view);
         generalRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         generalRecyclerView.setHasFixedSize(true);
 
@@ -102,11 +94,12 @@ public class HomeFragment extends Fragment {
         topBusinessRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         topBusinessRecyclerView.setHasFixedSize(true);
 
-        topSportRecyclerView = RootView.findViewById(R.id.business_recycler_view);
+        topSportRecyclerView = RootView.findViewById(R.id
+        .top_sport_recycler_view);
         topSportRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         topSportRecyclerView.setHasFixedSize(true);
 
-
+6
         homeViewModelFactory = new HomeViewModelFactory(getActivity().getApplication());
         homeViewModel = new ViewModelProvider(this, homeViewModelFactory)
                 .get(HomeViewModel.class);
@@ -145,7 +138,7 @@ public class HomeFragment extends Fragment {
         }
 
         //homeViewModel.initData();
-        homeViewModel.getAllGeneralNews().observe(getViewLifecycleOwner(), newsLocals -> generalLiveNewsAdapter.submitList(newsLocals));
+        homeViewModel.getAllGeneralNews().observe(getViewLifecycleOwner(),liveNews -> entertainmentLiveNewsAdapter.submitList(liveNews));
         homeViewModel.getAllEntertainmentNews().observe(getViewLifecycleOwner(), newsLocals -> entertainmentLiveNewsAdapter.submitList(newsLocals));
         homeViewModel.getAllTopBusinessNews().observe(getViewLifecycleOwner(), newsLocals -> businessLiveNewsAdapter.submitList(newsLocals));
         homeViewModel.getAllTopSportNews().observe(getViewLifecycleOwner(), newsLocals -> sportLiveNewsAdapter.submitList(newsLocals));
@@ -173,7 +166,7 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), WebActivity.class);
             intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
             startActivity(intent);
-        });
+        });*/
 
 
         return RootView;

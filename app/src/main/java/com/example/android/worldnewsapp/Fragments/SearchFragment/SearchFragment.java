@@ -4,15 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.example.android.worldnewsapp.R;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.fragment.app.Fragment;
+
+import com.example.android.worldnewsapp.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,7 +64,7 @@ public class SearchFragment extends Fragment {
         // Inflate the layout for this fragment
         View RootView = inflater.inflate(R.layout.fragment_search, container, false);
 
-        // Spinner element
+        /*// Spinner element
         RootView.findViewById(R.id.spinner_category);
         RootView.findViewById(R.id.spinner_country);
 
@@ -104,7 +100,7 @@ public class SearchFragment extends Fragment {
         // attaching data adapter to spinner
         spinnerCategory.setAdapter(dataCategoryAdapter);
         spinnerCountry.setAdapter(dataCountryAdapter);
-
+        */
 
         return RootView;
     }

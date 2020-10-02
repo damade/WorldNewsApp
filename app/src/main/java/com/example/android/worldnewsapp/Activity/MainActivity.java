@@ -8,6 +8,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.android.worldnewsapp.Adapter.NewsAdapter;
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.BusinessFragment.BusinessFragment;
@@ -32,16 +42,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -296,8 +296,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = getSupportActionBar();
+        assert toolbar != null;
         toolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         toolbar.setCustomView(R.layout.custom_toolbar);
+
+        loadFragment(new HomeFragment());
 
         //createNotificationChannel();
 
@@ -339,15 +342,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
-        homeViewModelFactory = new HomeViewModelFactory(getApplication());
-        homeViewModel = new ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel.class);
+        //homeViewModelFactory = new HomeViewModelFactory(getApplication());
+        //homeViewModel = new ViewModelProvider(this, homeViewModelFactory).get(HomeViewModel.class);
 
         cd = new ConnectionDetector(getApplicationContext());
 
         // Check if Internet present
         isInternetPresent = cd.isConnectingToInternet();
         if (isInternetPresent) {
-            homeViewModel.initData();
+            //homeViewModel.initData();
         }
 
         BottomNavigationView navigation = findViewById(R.id.bottomBar);
@@ -357,7 +360,6 @@ public class MainActivity extends AppCompatActivity {
         CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) navigation.getLayoutParams();
         layoutParams.setBehavior(new BottomNavigationBehaviour());
 
-        loadFragment(new HomeFragment());
 
     }
 }

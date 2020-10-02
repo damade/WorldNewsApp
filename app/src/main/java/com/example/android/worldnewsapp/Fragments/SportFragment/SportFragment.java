@@ -1,26 +1,19 @@
 package com.example.android.worldnewsapp.Fragments.SportFragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.android.worldnewsapp.Activity.WebActivity;
-import com.example.android.worldnewsapp.Adapter.FragmentNewsAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.android.worldnewsapp.Backend.Database.Model.DatabaseDetails;
 import com.example.android.worldnewsapp.Fragments.SportFragment.SportViewModel.SportViewModel;
 import com.example.android.worldnewsapp.Fragments.SportFragment.SportViewModel.SportViewModelFactory;
 import com.example.android.worldnewsapp.R;
 import com.example.android.worldnewsapp.Utils.AlertDialogManager;
 import com.example.android.worldnewsapp.Utils.ConnectionDetector;
-
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -86,7 +79,7 @@ public class SportFragment extends Fragment {
         // Inflate the layout for this fragment
         View RootView = inflater.inflate(R.layout.fragment_sport, container, false);
 
-        recyclerView = RootView.findViewById(R.id.business_recycler_view);
+        /*recyclerView = RootView.findViewById(R.id.business_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
@@ -122,7 +115,7 @@ public class SportFragment extends Fragment {
             Intent intent = new Intent(getActivity(), WebActivity.class);
             intent.putExtra(WebActivity.NEWS_URL, newsLocal.getUrl());
             startActivity(intent);
-        });
+        });*/
 
         // Inflate the layout for this fragment
         return RootView;
